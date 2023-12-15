@@ -1,16 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as apigw from 'aws-cdk-lib/aws-apigateway';
 
 export class IsoddCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const isodd = new lambda.Function(this, 'IsOddHandler', {
+      runtime: lambda.Runtime.NODEJS_LATEST,
+      code: lambda.Code.fromAsset('lambda'),
+      handler: 'isodd.handler'
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'IsoddCdkQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    new apigw.LambdaRestApi(this, 'Endpoint', {
+      handler: isodd
+    });
   }
 }
