@@ -1,17 +1,44 @@
-// import * as cdk from 'aws-cdk-lib';
-// import { Template } from 'aws-cdk-lib/assertions';
-// import * as IsoddCdk from '../lib/isodd-cdk-stack';
+// @ts-ignore
+import { handler } from '../lambda/isodd';
 
-// example test. To run these tests, uncomment this file along with the
-// example resource in lib/isodd-cdk-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App();
-//     // WHEN
-//   const stack = new IsoddCdk.IsoddCdkStack(app, 'MyTestStack');
-//     // THEN
-//   const template = Template.fromStack(stack);
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   });
+describe('isodd lambda function', () => {
+    it('should return "Your input is odd!" when called with an odd number', async () => {
+        const event = {
+            queryStringParameters: {
+                input: '3'
+            }
+        };
+
+        const result = await handler(event);
+
+        expect(result.statusCode).toBe(200);
+        expect(result.body).toBe('{\"message\":\"Your input is odd!\"}');
+    });
+
+    it('should return "Your input is even!" when called with an even number', async () => {
+        const event = {
+            queryStringParameters: {
+                input: '4'
+            }
+        };
+
+        const result = await handler(event);
+
+        expect(result.statusCode).toBe(200);
+        expect(result.body).toBe('{\"message\":\"Your input is even!\"}');
+    });
+
+    it('should return "Your input is not a valid integer!" when called with a non-integer value', async () => {
+        const event = {
+            queryStringParameters: {
+                input: 'abc'
+            }
+        };
+
+        const result = await handler(event);
+
+        expect(result.statusCode).toBe(200);
+        expect(result.body).toBe('{\"message\":\"Your input is not a valid integer!\"}');
+    });
 });
